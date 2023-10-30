@@ -1,0 +1,5 @@
+name = "OpenAI-GPT-3.5"
+version = "0.1.0"
+bifrost_version = "0.1.0"
+interface = "llm"
+interface_version = "0.1.0"
