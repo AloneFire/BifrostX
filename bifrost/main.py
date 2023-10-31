@@ -51,3 +51,18 @@ def start(config: StartConfigSchema):
 if __name__ == "__main__":
     start(config={"extension_dir": "."})
     logger.info("start")
+    from Interfaces.llm_chat import Interface
+    from Interfaces.llm_chat.interface import ChatInput, ChatSSE
+    from Adapters.llm_openai_gpt import Adapter, AdapterConfig
+
+    config = AdapterConfig(api_key="sk-xxxxxxxxxxxxxxx",
+                           api_base="https://api.openai-proxy.org/v1")
+    inputs = ChatInput(prompt="请讲一个高级的笑话")
+    instance: Interface = Adapter(config)
+
+
+    def callback(data: ChatSSE):
+        print(data.data.content, end="")
+
+
+    print(instance.chat_with_sse(inputs, callback))
