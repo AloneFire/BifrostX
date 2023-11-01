@@ -7,6 +7,8 @@ from bifrost.config import Config
 from bifrost.utils.logger import logger
 
 
+
+
 def init_extension_dir():
     """
     初始化扩展目录
@@ -27,3 +29,4 @@ def init_extension_dir():
             if item.is_dir() and item.name not in ("__pycache__",):
                 profile = profile_validator.load_by_model_name(item.name)
                 logger.info(f"Load {init_dir}.{item.name}: {profile}")
+                # TODO：记录列表
