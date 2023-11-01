@@ -1,7 +1,7 @@
 from bifrost.interface.base import BaseInterface
 from abc import abstractmethod
 from pydantic import BaseModel, confloat
-from typing import Optional, List, Callable
+from typing import Optional, List
 
 
 class ChatHistory(BaseModel):
@@ -14,11 +14,6 @@ class ChatInput(BaseModel):
     temperature: Optional[confloat(gt=0, lt=1)] = None
     top_p: Optional[confloat(gt=0, lt=1)] = None
     history: List[ChatHistory] = []
-
-
-class ChatSSE(BaseModel):
-    event: str
-    data: ChatHistory
 
 
 class Interface(BaseInterface):
@@ -34,5 +29,5 @@ class Interface(BaseInterface):
         return NotImplemented
 
     @abstractmethod
-    def chat_with_sse(self, inputs: ChatInput, callback: Callable):
+    def chat_with_stream(self, inputs: ChatInput) -> ChatHistory:
         return NotImplemented

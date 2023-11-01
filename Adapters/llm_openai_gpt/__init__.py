@@ -8,7 +8,7 @@ import openai
 import json
 import tiktoken
 
-from Interfaces.llm_chat.interface import ChatInput, ChatHistory, ChatSSE
+from Interfaces.llm_chat.interface import ChatInput, ChatHistory
 
 
 class OpenaiApiType(Enum):
@@ -24,7 +24,7 @@ class OpenaiModel(Enum):
     GPT4_32K = "gpt-4-32k"
 
 
-class AdapterConfig(BaseModel):
+class AdapterInstanceConfig(BaseModel):
     gpt_model: OpenaiModel = OpenaiModel.GPT35
     api_base: str = "https://api.openai.com/v1"
     api_type: OpenaiApiType = OpenaiApiType.OPENAI
@@ -34,20 +34,21 @@ class AdapterConfig(BaseModel):
 
 class Adapter(Interface):
     @validate_call
-    def __init__(self, config: AdapterConfig):
-        self.config = config
+    def __init__(self, instance_config: AdapterInstanceConfig):
+        self.instance_config = instance_config
+        self.config = Config.get_extension_config(__name__)
 
     @property
     def token_limits(self) -> int:
-        if self.config.gpt_model == OpenaiModel.GPT35_16K:
+        if self.instance_config.gpt_model == OpenaiModel.GPT35_16K:
             return 16 * 1024
-        elif self.config.gpt_model == OpenaiModel.GPT4_32K:
+        elif self.instance_config.gpt_model == OpenaiModel.GPT4_32K:
             return 32 * 1024
         else:
             return 4096
 
     def calculate_tokens(self, inputs: ChatInput) -> int:
-        enc = tiktoken.encoding_for_model(self.config.gpt_model.value)
+        enc = tiktoken.encoding_for_model(self.instance_config.gpt_model.value)
         messages = [h for h in inputs.history]
         messages.append(ChatHistory(role="user", content=inputs.prompt))
         total = 0
@@ -58,12 +59,12 @@ class Adapter(Interface):
         return total
 
     def _request(self, messages: List[ChatHistory], functions=[], temperature: float = 0, use_stream=False):
-        if Config.get("ADAPTER_LLM_OPENAI_GPT_PROXY"):
-            openai.proxy = Config.ADAPTER_LLM_OEPNAI_GPT_PROXY
-        openai.api_base = self.config.api_base
-        openai.api_key = self.config.api_key
-        openai.api_type = self.config.api_type.value
-        model = self.config.gpt_model.value
+        if self.config.get("proxy"):
+            openai.proxy = self.config.get("proxy")
+        openai.api_base = self.instance_config.api_base
+        openai.api_key = self.instance_config.api_key
+        openai.api_type = self.instance_config.api_type.value
+        model = self.instance_config.gpt_model.value
         if functions:
             resp = openai.ChatCompletion.create(
                 model=model,
@@ -86,13 +87,14 @@ class Adapter(Interface):
         if token_count > self.token_limits:
             raise ValueError("请求超出Token最大限制")
         logger.info(f"\nPrompt: {inputs.prompt}\nToken: {token_count}")
-        temperature = inputs.temperature if inputs.temperature else self.config.default_temperature
+        temperature = inputs.temperature if inputs.temperature else self.instance_config.default_temperature
         messages = [h.model_dump() for h in inputs.history]
         messages.append(ChatHistory(role="user", content=inputs.prompt).model_dump())
         resp = self._request(messages=messages, temperature=temperature, use_stream=use_stream)
         return resp
 
-    def chat_with_sse(self, inputs: ChatInput, callback: Callable):
+    @validate_call
+    def chat_with_stream(self, inputs: ChatInput) -> ChatHistory:
         resp = self._chat(inputs, use_stream=True)
         role = "assistant"
         for chunk in resp:
@@ -102,11 +104,10 @@ class Adapter(Interface):
                 content = chunk["choices"][0]["delta"].get("content")
             else:
                 content = ""
-            result = ChatSSE(event="add", data=ChatHistory(role=role, content=content))
-            if chunk["choices"][0]["finish_reason"] == "stop":
-                result = ChatSSE(event="finish", data=ChatHistory(role=role, content=content))
-            callback(result)
+            result = ChatHistory(role=role, content=content)
+            yield result
 
+    @validate_call
     def chat(self, inputs: ChatInput) -> ChatHistory:
         resp = self._chat(inputs, use_stream=False)
         return ChatHistory(**resp["choices"][0]["message"])
