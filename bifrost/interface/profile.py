@@ -2,6 +2,8 @@ from bifrost.core.profile import BaseProfile
 
 
 class InterfaceProfile(BaseProfile):
+    enter_class: str = "Interface"
+
     @classmethod
-    def load_by_model_name(cls, model_name):
-        return super().load_by_model_name(f"Interfaces.{model_name}")
+    def load_by_module_name(cls, module_name):
+        return super().load_by_module_name(f"Interfaces.{module_name}")

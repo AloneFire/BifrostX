@@ -13,10 +13,12 @@ import subprocess
 
 
 class BaseProfile(BaseModel):
+    module_name: str = ""
     version: str
     display_name: str
     bifrost_version: str
     dependencies: List[str] = []
+    enter_class: str
 
     @field_validator("version")
     @classmethod
@@ -34,15 +36,30 @@ class BaseProfile(BaseModel):
         raise ValueError(f"拓展需求版本与当前不匹配")
 
     @classmethod
-    def load_by_model(cls, model):
-        info = Path(model.__file__).parent.joinpath('bifrost.toml').read_text(encoding='utf-8')
-        info = tomli.loads(info)
-        return cls(**info)
+    def load_by_module(cls, module):
+        file = Path(module.__file__).parent.joinpath('bifrost.toml')
+        if not file.exists():
+            raise ValueError("未找到bifrost.toml")
+        info = tomli.loads(file.read_text(encoding='utf-8'))
+        rel = cls(**info)
+        rel.module_name = module.__name__
+        return rel
 
     @classmethod
-    def load_by_model_name(cls, model_name):
-        model = import_module(model_name)
-        return cls.load_by_model(model)
+    def load_by_module_name(cls, module_name):
+        module = import_module(module_name)
+        return cls.load_by_module(module)
+
+    def load_enter_class(self):
+        enter_class_path = self.enter_class.strip().strip(".").rsplit(":", 1)
+        if len(enter_class_path) == 1:
+            module = import_module(self.module_name)
+        else:
+            module = import_module(f"{self.module_name}.{enter_class_path[0]}")
+        if hasattr(module, enter_class_path[-1]):
+            return getattr(module, enter_class_path[-1])
+        else:
+            raise ValueError(f"Enter Class: {self.module_name}.{self.enter_class}不存在")
 
     @model_validator(mode='after')
     def validate_dependencies(self):

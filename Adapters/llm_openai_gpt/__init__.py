@@ -1,7 +1,7 @@
 from typing import Callable, List
 from bifrost.config import Config
 from bifrost.utils.logger import logger
-from Interfaces.llm_chat import Interface
+from Interfaces.llm_chat.interface import Interface
 from pydantic import BaseModel, validate_call, confloat
 from enum import Enum
 import openai
