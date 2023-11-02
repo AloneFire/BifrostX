@@ -10,6 +10,7 @@ import pkg_resources
 from bifrost.utils.logger import logger
 import sys
 import subprocess
+from bifrost.config import Config
 
 
 class BaseProfile(BaseModel):
@@ -47,8 +48,13 @@ class BaseProfile(BaseModel):
 
     @classmethod
     def load_by_module_name(cls, module_name):
-        module = import_module(module_name)
-        return cls.load_by_module(module)
+        file = Path(Config.EXTENSION_DIR).joinpath(*module_name.split(".")).joinpath("bifrost.toml")
+        if not file.exists():
+            raise ValueError("未找到bifrost.toml")
+        info = tomli.loads(file.read_text(encoding='utf-8'))
+        rel = cls(**info)
+        rel.module_name = module_name
+        return rel
 
     def load_enter_class(self):
         enter_class_path = self.enter_class.strip().strip(".").rsplit(":", 1)

@@ -1,8 +1,6 @@
 from bifrost.utils.logger import logger
 from bifrost.config import Config
 from bifrost.initialization import init_extension_dir
-from Adapters.llm_openai_gpt import Adapter, AdapterInstanceConfig
-from bifrost.interface.profile import InterfaceProfile
 from bifrost.interface.register import InterfaceRegister
 logger.info("init extension dir")
 init_extension_dir()
