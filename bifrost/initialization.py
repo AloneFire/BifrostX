@@ -11,6 +11,7 @@ def init_extension_dir():
     """
     初始化扩展目录
     """
+    logger.info("Initializing extension directory...")
     ext_dir = Path(Config.EXTENSION_DIR)
     if str(ext_dir.absolute()) not in sys.path:
         sys.path.append(str(ext_dir.absolute()))

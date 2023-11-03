@@ -3,12 +3,18 @@ from bifrost.interface.base import BaseInterface
 from bifrost.utils.logger import logger
 from .profile import AdapterProfile
 from typing import Dict, List, Type
+from bifrost.config import Config
 
 
 class AdapterInfo(BaseModel):
     module_name: str
     adapter: Type[BaseInterface]
     profile: AdapterProfile
+
+    @property
+    def instance_configs(self):
+        instances_configs = Config.get_extension_config(f"Adapters.{self.module_name}", instances=True)
+        return instances_configs
 
 
 class AdapterRegister:

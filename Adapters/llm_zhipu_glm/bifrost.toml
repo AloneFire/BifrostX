@@ -1,0 +1,7 @@
+version = "0.1.0"
+bifrost_version = "0.1.0"
+display_name = "ChatGLM"
+dependencies = ["zhipuai"]
+[[implements]]
+interface = "llm_chat"
+interface_version = "0.1.0"

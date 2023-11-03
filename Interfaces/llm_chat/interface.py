@@ -1,6 +1,7 @@
 from bifrost.interface.base import BaseInterface
 from abc import abstractmethod
 from .schema import *
+from pydantic import validate_call
 
 
 class Interface(BaseInterface):
@@ -11,21 +12,23 @@ class Interface(BaseInterface):
         """
         return 4096
 
-    def calculate_tokens(self, inputs: ChatInput) -> int:
+    def calculate_tokens(self, inputs: ChatInputs) -> int:
         """
         预测 Token 长度
         """
-        return len(inputs.prompt)
+        return len([h.content for h in inputs.prompt])
 
     @abstractmethod
-    def chat(self, inputs: ChatInput) -> ChatHistory:
+    def chat(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
+             top_p: Optional[confloat(gt=0, lt=1)] = None) -> ChatHistory:
         """
         对话
         """
         return NotImplemented
 
     @abstractmethod
-    def chat_with_stream(self, inputs: ChatInput) -> ChatHistory:
+    def chat_with_stream(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
+                         top_p: Optional[confloat(gt=0, lt=1)] = None) -> ChatHistory:
         """
         对话，SSE流式结果返回
         """

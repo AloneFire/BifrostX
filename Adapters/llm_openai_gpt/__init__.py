@@ -1,14 +1,13 @@
-from typing import Callable, List
+from typing import List, Optional
 from bifrost.config import Config
 from bifrost.utils.logger import logger
 from Interfaces.llm_chat.interface import Interface
 from pydantic import BaseModel, validate_call, confloat
 from enum import Enum
 import openai
-import json
 import tiktoken
 
-from Interfaces.llm_chat.interface import ChatInput, ChatHistory
+from Interfaces.llm_chat.interface import ChatInputs, ChatHistory
 
 
 class OpenaiApiType(Enum):
@@ -33,9 +32,10 @@ class AdapterInstanceConfig(BaseModel):
 
 
 class Adapter(Interface):
-    @validate_call
+    instance_config_schema = AdapterInstanceConfig
+
     def __init__(self, instance_config: AdapterInstanceConfig):
-        self.instance_config = instance_config
+        super().__init__(instance_config)
         self.config = Config.get_extension_config(__name__)
 
     @property
@@ -47,10 +47,9 @@ class Adapter(Interface):
         else:
             return 4096
 
-    def calculate_tokens(self, inputs: ChatInput) -> int:
+    def calculate_tokens(self, inputs: ChatInputs) -> int:
         enc = tiktoken.encoding_for_model(self.instance_config.gpt_model.value)
-        messages = [h for h in inputs.history]
-        messages.append(ChatHistory(role="user", content=inputs.prompt))
+        messages = inputs.prompt
         total = 0
         for msg in messages:
             total += 3 + len(enc.encode(msg.role)) + len(
@@ -82,19 +81,27 @@ class Adapter(Interface):
             )
         return resp
 
-    def _chat(self, inputs: ChatInput, use_stream=False):
+    def _chat(self, inputs: ChatInputs, use_stream=False):
         token_count = self.calculate_tokens(inputs)
         if token_count > self.token_limits:
             raise ValueError("请求超出Token最大限制")
         logger.info(f"\nPrompt: {inputs.prompt}\nToken: {token_count}")
         temperature = inputs.temperature if inputs.temperature else self.instance_config.default_temperature
-        messages = [h.model_dump() for h in inputs.history]
-        messages.append(ChatHistory(role="user", content=inputs.prompt).model_dump())
+        messages = [h.model_dump() for h in inputs.prompt]
         resp = self._request(messages=messages, temperature=temperature, use_stream=use_stream)
         return resp
 
     @validate_call
-    def chat_with_stream(self, inputs: ChatInput) -> ChatHistory:
+    def chat(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
+             top_p: Optional[confloat(gt=0, lt=1)] = None):
+        inputs = ChatInputs(prompt=prompt, temperature=temperature, top_p=top_p)
+        resp = self._chat(inputs, use_stream=False)
+        return ChatHistory(**resp["choices"][0]["message"])
+
+    @validate_call
+    def chat_with_stream(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
+                         top_p: Optional[confloat(gt=0, lt=1)] = None) -> ChatHistory:
+        inputs = ChatInputs(prompt=prompt, temperature=temperature, top_p=top_p)
         resp = self._chat(inputs, use_stream=True)
         role = "assistant"
         for chunk in resp:
@@ -106,8 +113,3 @@ class Adapter(Interface):
                 content = ""
             result = ChatHistory(role=role, content=content)
             yield result
-
-    @validate_call
-    def chat(self, inputs: ChatInput) -> ChatHistory:
-        resp = self._chat(inputs, use_stream=False)
-        return ChatHistory(**resp["choices"][0]["message"])
