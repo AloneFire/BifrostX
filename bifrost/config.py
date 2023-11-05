@@ -60,7 +60,7 @@ class ConfigObject(BaseSettings):
             return getattr(self, modules[0]).get(modules[1], {}).get(key, {})
         raise ValueError(f"未找到相关{module_name}配置")
 
-    DEBUG: bool = True
+    LOG_LEVEL: str = "DEBUG"
     EXTENSION_DIR: str = "."
     Adapters: Dict = {}
     Interfaces: Dict = {}
