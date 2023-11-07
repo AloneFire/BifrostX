@@ -8,13 +8,16 @@ from pydantic import BaseModel, validate_call
 from hypercorn.config import Config as HypercornConfig
 from hypercorn.asyncio import serve
 from bifrost.initialization import init_extension_dir
-from typing import List
+from typing import List, Dict, Optional
+from bifrost.component.register import ComponentRegister
+from bifrost.adapter.register import AdapterRegister
 
 
 class RouterConfig(BaseModel):
-    path: str
     component: str
-    adapter_instances: list = []
+    summary: Optional[str] = None
+    description: Optional[str] = None
+    config: dict = {}
 
 
 class ServerConfig(BaseModel):
@@ -26,7 +29,7 @@ class ServerConfig(BaseModel):
     server_access_log: str = "-"
     server_error_log: str = "-"
     server_use_reloader: bool = True
-    routers: List[RouterConfig] = []
+    routers: Dict[str, RouterConfig] = []
 
 
 def index_view(server_config: ServerConfig):
@@ -41,22 +44,21 @@ def index_view(server_config: ServerConfig):
 
 def register_routers(app: FastAPI, server_config: ServerConfig):
     api_router = APIRouter(prefix="/api")
-    # TODO: add routers
-    from Components.chat_with_llm import Component, ComponentConfig
-    from Interfaces.llm_chat.interface import Interface as LLL_Chat_Interface
-
-    instacnce_congfig = ComponentConfig(
-        llm_chat_instance=LLL_Chat_Interface.get_instance()
-    )
-    component = Component(instacnce_congfig)
-
-    endpoints = [func for func in dir(component) if func.startswith("api_")]
-    for endpoint in endpoints:
-        api_router.add_api_route(
-            path=f"/{component.__module__.split('.')[-1]}/{endpoint[4:]}",
-            endpoint=getattr(component, endpoint),
-            methods=["POST"],
-        )
+    for router_name, router_config in server_config.routers.items():
+        if router_config.component not in ComponentRegister.components:
+            raise ValueError(f"未找到Component: {router_config.component}")
+        component_info = ComponentRegister.components[router_config.component]
+        component_instance_config = router_config.config
+        component = component_info.component(component_instance_config)
+        endpoints = [func for func in dir(component) if func.startswith("api_")]
+        for endpoint in endpoints:
+            api_router.add_api_route(
+                path=f"/{router_name}/{endpoint[4:]}",
+                endpoint=getattr(component, endpoint),
+                methods=["POST"],
+                summary=router_config.summary,
+                description=router_config.description,
+            )
     app.include_router(api_router)
 
 

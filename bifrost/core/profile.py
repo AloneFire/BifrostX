@@ -38,20 +38,24 @@ class BaseProfile(BaseModel):
 
     @classmethod
     def load_by_module(cls, module):
-        file = Path(module.__file__).parent.joinpath('bifrost.toml')
+        file = Path(module.__file__).parent.joinpath("bifrost.toml")
         if not file.exists():
             raise ValueError("未找到bifrost.toml")
-        info = tomli.loads(file.read_text(encoding='utf-8'))
+        info = tomli.loads(file.read_text(encoding="utf-8"))
         rel = cls(**info)
         rel.module_name = module.__name__
         return rel
 
     @classmethod
     def load_by_module_name(cls, module_name):
-        file = Path(Config.EXTENSION_DIR).joinpath(*module_name.split(".")).joinpath("bifrost.toml")
+        file = (
+            Path(Config.EXTENSION_DIR)
+            .joinpath(*module_name.split("."))
+            .joinpath("bifrost.toml")
+        )
         if not file.exists():
             raise ValueError("未找到bifrost.toml")
-        info = tomli.loads(file.read_text(encoding='utf-8'))
+        info = tomli.loads(file.read_text(encoding="utf-8"))
         rel = cls(**info)
         rel.module_name = module_name
         return rel
@@ -67,17 +71,21 @@ class BaseProfile(BaseModel):
         else:
             raise ValueError(f"Enter Class: {self.module_name}.{self.enter_class}不存在")
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_dependencies(self):
         if not self.dependencies:
             return self
         for dependency in self.dependencies:
-            rel = re.search(r"^([^>=<]*)([>=<]*)([^>=<]*)$", dependency.replace(" ", ""))
+            rel = re.search(
+                r"^([^>=<]*)([>=<]*)([^>=<]*)$", dependency.replace(" ", "")
+            )
             if rel:
                 key, _, ver = rel.groups()
                 # TODO: 检查依赖版本冲突
                 if key not in [pkg.key for pkg in pkg_resources.working_set]:
-                    subprocess.check_call([sys.executable, "-m", "pip", "install", dependency])
+                    subprocess.check_call(
+                        [sys.executable, "-m", "pip", "install", dependency]
+                    )
             else:
                 logger.warning(f"{self.display_name} 依赖包 {dependency} 格式不正确")
         return self

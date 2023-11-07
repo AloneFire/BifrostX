@@ -7,19 +7,20 @@ from bifrost.config import Config
 
 
 class ComponentConfig(BaseModel):
-    llm_chat_instance: InstanceOf[LLL_Chat_Interface]
+    llm_chat_instance: str
+
 
 class ApiChatCompletionsInputs(BaseModel):
     messages: List[ChatHistory]
 
 
 class Component(BaseComponent):
-    def __init__(self, config: ComponentConfig):
-        super().__init__(config)
-        self.instance_config = config
-        self.config = Config.get_extension_config(__name__)
+    instance_config_schema = ComponentConfig
+
+    @property
+    def llm_chat_instance(self):
+        return LLL_Chat_Interface.get_instance(self.instance_config.llm_chat_instance)
 
     def api_chat_completions(self, inputs: ApiChatCompletionsInputs):
-        output = self.instance_config.llm_chat_instance.chat(prompt=inputs.messages)
+        output = self.llm_chat_instance.chat(prompt=inputs.messages)
         return output
-
