@@ -8,9 +8,8 @@ from pydantic import BaseModel, validate_call
 from hypercorn.config import Config as HypercornConfig
 from hypercorn.asyncio import serve
 from bifrost.initialization import init_extension_dir
-from typing import List, Dict, Optional
+from typing import Dict, Optional
 from bifrost.component.register import ComponentRegister
-from bifrost.adapter.register import AdapterRegister
 
 
 class RouterConfig(BaseModel):
