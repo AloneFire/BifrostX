@@ -10,6 +10,7 @@ from hypercorn.asyncio import serve
 from bifrost.initialization import init_extension_dir
 from typing import Dict, Optional
 from bifrost.component.register import ComponentRegister
+from bifrost.config import Config
 
 
 class RouterConfig(BaseModel):
@@ -71,9 +72,9 @@ def create_app(server_config: ServerConfig):
     app.add_api_route("/", index_view(server_config), methods=["GET"], summary="首页")
     # 注册routers
     register_routers(app, server_config)
-    if Path("fontend").exists():
+    if Path(Config.FONTEND_DIR).exists():
         # 注册默认静态资源
-        app.mount("/", StaticFiles(directory="fontend"), name="fontend")
+        app.mount("/", StaticFiles(directory=Config.FONTEND_DIR), name="fontend")
     return app
 
 

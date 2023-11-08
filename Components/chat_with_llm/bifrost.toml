@@ -1,3 +1,6 @@
 display_name = "对话"
 version = "0.1.0"
 bifrost_version = "0.1.0"
+[[references]]
+interface = "llm_chat"
+interface_version = "0.1.0"
