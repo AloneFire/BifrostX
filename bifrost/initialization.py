@@ -18,7 +18,7 @@ def init_extension_dir():
     init_dirs = {
         "Interfaces": InterfaceRegister,
         "Adapters": AdapterRegister,
-        "Components": ComponentRegister
+        "Components": ComponentRegister,
     }
     for init_dir, register in init_dirs.items():
         item_dir = ext_dir.joinpath(init_dir)

@@ -23,12 +23,12 @@ class ServerConfig(BaseModel):
     app_name: str = "BifrostServer"
     app_version: str = "0.1.0"
     app_description: str = ""
-    server_bind: str = "0.0.0.0:8100"
+    server_bind: str = "127.0.0.1:8100"
     server_workers: int = 2
     server_access_log: str = "-"
     server_error_log: str = "-"
     server_use_reloader: bool = True
-    routers: Dict[str, RouterConfig] = []
+    routers: Dict[str, RouterConfig] = {}
 
 
 def index_view(server_config: ServerConfig):
@@ -71,8 +71,9 @@ def create_app(server_config: ServerConfig):
     app.add_api_route("/", index_view(server_config), methods=["GET"], summary="首页")
     # 注册routers
     register_routers(app, server_config)
-    # 注册默认静态资源
-    app.mount("/", StaticFiles(directory="fontend"), name="fontend")
+    if Path("fontend").exists():
+        # 注册默认静态资源
+        app.mount("/", StaticFiles(directory="fontend"), name="fontend")
     return app
 
 
@@ -85,6 +86,7 @@ def start_server(server_config: ServerConfig = None):
             server_config = ServerConfig(**server_config)
         else:
             server_config = ServerConfig()
+            config_file.touch()
     init_extension_dir()
     app = create_app(server_config)
     # [doc](https://hypercorn.readthedocs.io/en/latest/how_to_guides/configuring.html#)

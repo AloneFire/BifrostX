@@ -1,10 +1,8 @@
 [project]
-name = "Bifrost2"
+name = "Bifrost"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "Bevis", email = "alonefire@foxmail.com"},
-]
+description = "Connect and change the world, Bifrost makes creation simple."
+authors = [{ name = "Bevis", email = "alonefire@foxmail.com" }]
 dependencies = [
     "pydantic>=2.4.2",
     "loguru>=0.7.2",
@@ -15,13 +13,17 @@ dependencies = [
 ]
 requires-python = ">=3.9"
 readme = "README.md"
-license = {text = "MIT"}
+license = { text = "MIT" }
 
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
+[project.entry-points.console_scripts]
+bifrost = "bifrost.cli:cli"
+
 [tool.pdm.dev-dependencies]
-dev = [
-    "black>=23.10.1",
-]
+dev = ["black>=23.10.1"]
+
+[tool.pdm.build]
+excludes = ["test/", "Adapters/", "Interfaces/", "Components/", "fontend/"]

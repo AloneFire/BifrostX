@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, confloat, validate_call
+from bifrost.core.data_model import BaseModel, confloat, validate_call
 from enum import Enum
 from Interfaces.llm_chat.interface import Interface
 from Interfaces.llm_chat.schema import ChatInputs, ChatHistory
@@ -32,7 +32,7 @@ class Adapter(Interface):
                 prompt=messages,
                 temperature=temperature,
                 top_p=top_p,
-                incremental=True
+                incremental=True,
             )
         else:
             resp = zhipuai.model_api.invoke(
@@ -43,17 +43,24 @@ class Adapter(Interface):
             )
         return resp
 
-
     @validate_call
-    def chat(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
-             top_p: Optional[confloat(gt=0, lt=1)] = None) -> ChatHistory:
+    def chat(
+        self,
+        prompt: List[ChatHistory],
+        temperature: Optional[confloat(gt=0, lt=1)] = None,
+        top_p: Optional[confloat(gt=0, lt=1)] = None,
+    ) -> ChatHistory:
         inputs = ChatInputs(prompt=prompt, temperature=temperature, top_p=top_p)
         resp = self._chat(inputs)
         return ChatHistory(**resp["data"]["choices"][0])
 
     @validate_call
-    def chat_with_stream(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
-                         top_p: Optional[confloat(gt=0, lt=1)] = None) -> ChatHistory:
+    def chat_with_stream(
+        self,
+        prompt: List[ChatHistory],
+        temperature: Optional[confloat(gt=0, lt=1)] = None,
+        top_p: Optional[confloat(gt=0, lt=1)] = None,
+    ) -> ChatHistory:
         inputs = ChatInputs(prompt=prompt, temperature=temperature, top_p=top_p)
         resp = self._chat(inputs, use_stream=True)
         for event in resp.events():

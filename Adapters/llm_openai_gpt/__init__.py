@@ -2,7 +2,7 @@ from typing import List, Optional
 from bifrost.config import Config
 from bifrost.utils.logger import logger
 from Interfaces.llm_chat.interface import Interface
-from pydantic import BaseModel, validate_call, confloat
+from bifrost.core.data_model import BaseModel, validate_call, confloat
 from enum import Enum
 import openai
 import tiktoken
@@ -52,12 +52,19 @@ class Adapter(Interface):
         messages = inputs.prompt
         total = 0
         for msg in messages:
-            total += 3 + len(enc.encode(msg.role)) + len(
-                enc.encode(msg.content))  # every message follows <|start|>{role/name}\n{content}<|end|>
+            total += (
+                3 + len(enc.encode(msg.role)) + len(enc.encode(msg.content))
+            )  # every message follows <|start|>{role/name}\n{content}<|end|>
         total += 3  # every reply is primed with <|start|>assistant<|message|>
         return total
 
-    def _request(self, messages: List[ChatHistory], functions=[], temperature: float = 0, use_stream=False):
+    def _request(
+        self,
+        messages: List[ChatHistory],
+        functions=[],
+        temperature: float = 0,
+        use_stream=False,
+    ):
         if self.config.get("proxy"):
             openai.proxy = self.config.get("proxy")
         openai.api_base = self.instance_config.api_base
@@ -86,21 +93,35 @@ class Adapter(Interface):
         if token_count > self.token_limits:
             raise ValueError("请求超出Token最大限制")
         logger.info(f"\nPrompt: {inputs.prompt}\nToken: {token_count}")
-        temperature = inputs.temperature if inputs.temperature else self.instance_config.default_temperature
+        temperature = (
+            inputs.temperature
+            if inputs.temperature
+            else self.instance_config.default_temperature
+        )
         messages = [h.model_dump() for h in inputs.prompt]
-        resp = self._request(messages=messages, temperature=temperature, use_stream=use_stream)
+        resp = self._request(
+            messages=messages, temperature=temperature, use_stream=use_stream
+        )
         return resp
 
     @validate_call
-    def chat(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
-             top_p: Optional[confloat(gt=0, lt=1)] = None):
+    def chat(
+        self,
+        prompt: List[ChatHistory],
+        temperature: Optional[confloat(gt=0, lt=1)] = None,
+        top_p: Optional[confloat(gt=0, lt=1)] = None,
+    ):
         inputs = ChatInputs(prompt=prompt, temperature=temperature, top_p=top_p)
         resp = self._chat(inputs, use_stream=False)
         return ChatHistory(**resp["choices"][0]["message"])
 
     @validate_call
-    def chat_with_stream(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
-                         top_p: Optional[confloat(gt=0, lt=1)] = None) -> ChatHistory:
+    def chat_with_stream(
+        self,
+        prompt: List[ChatHistory],
+        temperature: Optional[confloat(gt=0, lt=1)] = None,
+        top_p: Optional[confloat(gt=0, lt=1)] = None,
+    ) -> ChatHistory:
         inputs = ChatInputs(prompt=prompt, temperature=temperature, top_p=top_p)
         resp = self._chat(inputs, use_stream=True)
         role = "assistant"

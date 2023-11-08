@@ -4,20 +4,30 @@ import tomli
 from pathlib import Path
 
 from pydantic.fields import FieldInfo
-from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 
 class TomlConfigSettingSource(PydanticBaseSettingsSource):
-    def get_field_value(self, field: FieldInfo, field_name: str) -> tuple[Any, str, bool]:
+    def get_field_value(
+        self, field: FieldInfo, field_name: str
+    ) -> tuple[Any, str, bool]:
         config_file = self.config.get("bifrost_config", "config.toml")
         file_path = Path(config_file)
         if file_path.exists():
             data = tomli.loads(file_path.read_text("utf8"))
             field_value = data.get(field_name)
             return field_value, field_name, False
-        raise Exception(f"not found {file_path.absolute()}")
+        else:
+            file_path.touch()
+            return None, field_name, False
 
-    def prepare_field_value(self, field_name: str, field: FieldInfo, value: Any, value_is_complex: bool) -> Any:
+    def prepare_field_value(
+        self, field_name: str, field: FieldInfo, value: Any, value_is_complex: bool
+    ) -> Any:
         return value
 
     def __call__(self, *args, **kwargs):
@@ -38,17 +48,14 @@ class TomlConfigSettingSource(PydanticBaseSettingsSource):
 class ConfigObject(BaseSettings):
     @classmethod
     def settings_customise_sources(
-            cls,
-            settings_cls: Type[BaseSettings],
-            init_settings: PydanticBaseSettingsSource,
-            env_settings: PydanticBaseSettingsSource,
-            dotenv_settings: PydanticBaseSettingsSource,
-            file_secret_settings: PydanticBaseSettingsSource,
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
-        return (
-            init_settings,
-            TomlConfigSettingSource(settings_cls)
-        )
+        return (init_settings, TomlConfigSettingSource(settings_cls))
 
     def get_extension_config(self, module: Union[str, Type], instances=False) -> Dict:
         key = "instances" if instances else "config"

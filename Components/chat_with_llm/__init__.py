@@ -1,7 +1,7 @@
 from bifrost.component.base import BaseComponent
 from Interfaces.llm_chat.schema import ChatHistory, ChatInputs
 from Interfaces.llm_chat.interface import Interface as LLL_Chat_Interface
-from pydantic import BaseModel, InstanceOf
+from bifrost.core.data_model import BaseModel, InstanceOf
 from typing import List
 from bifrost.config import Config
 
@@ -19,7 +19,12 @@ class Component(BaseComponent):
 
     @property
     def llm_chat_instance(self):
-        return LLL_Chat_Interface.get_instance(self.instance_config.llm_chat_instance)
+        instance = LLL_Chat_Interface.get_instance(
+            self.instance_config.llm_chat_instance
+        )
+        if instance is None:
+            raise Exception("LLM Chat instance not found")
+        return instance
 
     def api_chat_completions(self, inputs: ApiChatCompletionsInputs):
         output = self.llm_chat_instance.chat(prompt=inputs.messages)

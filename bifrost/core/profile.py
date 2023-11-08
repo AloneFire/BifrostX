@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator, model_validator
-from bifrost.__version__ import version
+from bifrost.__version__ import version as bifrost_version
 from distutils.version import LooseVersion
 import re
 from pathlib import Path
@@ -17,7 +17,7 @@ class BaseProfile(BaseModel):
     module_name: str = ""
     version: str
     display_name: str
-    bifrost_version: str
+    bifrost_version: str = ""
     dependencies: List[str] = []
     enter_class: str
 
@@ -31,10 +31,12 @@ class BaseProfile(BaseModel):
     @field_validator("bifrost_version")
     @classmethod
     def validate_bifrost_version(cls, value: str):
-        current_version = LooseVersion(version)
-        if current_version >= LooseVersion(value):
-            return value
-        raise ValueError(f"拓展需求版本与当前不匹配")
+        if value:
+            current_version = LooseVersion(bifrost_version)
+            if current_version >= LooseVersion(value):
+                return value
+            raise ValueError(f"拓展需求版本与当前不匹配")
+        return value
 
     @classmethod
     def load_by_module(cls, module):

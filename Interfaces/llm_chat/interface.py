@@ -1,7 +1,7 @@
 from bifrost.interface.base import BaseInterface
 from abc import abstractmethod
 from .schema import *
-from pydantic import validate_call
+from bifrost.core.data_model import validate_call
 
 
 class Interface(BaseInterface):
@@ -19,16 +19,24 @@ class Interface(BaseInterface):
         return len([h.content for h in inputs.prompt])
 
     @abstractmethod
-    def chat(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
-             top_p: Optional[confloat(gt=0, lt=1)] = None) -> ChatHistory:
+    def chat(
+        self,
+        prompt: List[ChatHistory],
+        temperature: Optional[confloat(gt=0, lt=1)] = None,
+        top_p: Optional[confloat(gt=0, lt=1)] = None,
+    ) -> ChatHistory:
         """
         对话
         """
         return NotImplemented
 
     @abstractmethod
-    def chat_with_stream(self, prompt: List[ChatHistory], temperature: Optional[confloat(gt=0, lt=1)] = None,
-                         top_p: Optional[confloat(gt=0, lt=1)] = None) -> ChatHistory:
+    def chat_with_stream(
+        self,
+        prompt: List[ChatHistory],
+        temperature: Optional[confloat(gt=0, lt=1)] = None,
+        top_p: Optional[confloat(gt=0, lt=1)] = None,
+    ) -> ChatHistory:
         """
         对话，SSE流式结果返回
         """

@@ -1,6 +1,6 @@
 from bifrost.interface.base import BaseInterface
 from abc import abstractmethod
-from pydantic import BaseModel, confloat, constr, field_validator
+from bifrost.core.data_model import BaseModel, confloat, constr, field_validator
 from typing import Optional, List
 
 
@@ -16,8 +16,7 @@ class ChatInputs(BaseModel):
 
     @field_validator("prompt")
     @classmethod
-    def validate_prompt(cls, value:List[ChatHistory]):
+    def validate_prompt(cls, value: List[ChatHistory]):
         if value and value[-1].role == "user":
             return value
         raise ValueError("prompt must end with a user message")
-
