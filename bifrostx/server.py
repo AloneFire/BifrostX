@@ -34,9 +34,9 @@ class ServerConfig(BaseModel):
 
 def index_view(server_config: ServerConfig):
     def index():
-        fontend_index = "fontend/index.html"
-        if Path(fontend_index).exists():
-            return HTMLResponse(open(fontend_index).read())
+        fontend_index = Path(Config.FONTEND_DIR).joinpath("index.html")
+        if fontend_index.exists():
+            return HTMLResponse(fontend_index.read_text())
         return HTMLResponse(f"<h1>Hello {server_config.app_name}</h1>")
 
     return index
