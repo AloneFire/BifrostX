@@ -1,4 +1,3 @@
-version = "0.1.0"
+version = "0.2.0"
 bifrostx_version = "0.1.0"
 display_name = "大语言模型对话接口"
-enter_class = "interface:Interface"

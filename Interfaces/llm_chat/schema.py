@@ -9,6 +9,17 @@ class ChatHistory(BaseModel):
     content: str
 
 
+class ChatTokenUsage(BaseModel):
+    inputs: int = 0
+    outputs: int = 0
+    total: int = 0
+
+
+class ChatOutputs(BaseModel):
+    message: ChatHistory
+    usage: ChatTokenUsage
+
+
 class ChatInputs(BaseModel):
     prompt: List[ChatHistory]
     temperature: Optional[confloat(gt=0, lt=1)] = None

@@ -1,7 +1,7 @@
 version = "0.1.0"
 bifrostx_version = "0.1.0"
-display_name = "OpenAI-GPT"
-dependencies = ["openai", "tiktoken"]
+display_name = "Qwen"
+dependencies = ["dashscope"]
 [[implements]]
 interface = "llm_chat"
 interface_version = "0.2.0"

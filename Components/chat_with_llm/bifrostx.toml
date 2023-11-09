@@ -3,4 +3,4 @@ version = "0.1.0"
 bifrostx_version = "0.1.0"
 [[references]]
 interface = "llm_chat"
-interface_version = "0.1.0"
+interface_version = "0.2.0"

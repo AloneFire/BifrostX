@@ -2,10 +2,11 @@ from abc import ABC
 from bifrostx.config import Config
 from pydantic import BaseModel
 from bifrostx.utils.logger import logger
+from typing import Type
 
 
 class BaseInterface(ABC):
-    instance_config_schema: BaseModel = None
+    instance_config_schema: Type[BaseModel] = None
 
     def __init__(self, instance_config):
         self.instance_config = (

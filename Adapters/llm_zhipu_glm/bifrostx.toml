@@ -4,4 +4,4 @@ display_name = "ChatGLM"
 dependencies = ["zhipuai"]
 [[implements]]
 interface = "llm_chat"
-interface_version = "0.1.0"
+interface_version = "0.2.0"
