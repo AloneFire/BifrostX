@@ -1,12 +1,10 @@
 import click
 from bifrostx.server import start_server
-from bifrostx.__version__ import metadata
+from bifrostx import __version__
 
 
 @click.group
-@click.version_option(
-    version=metadata["project"]["version"], prog_name=metadata["project"]["name"]
-)
+@click.version_option(version=__version__, prog_name="BifrostX")
 def cli():
     pass
 

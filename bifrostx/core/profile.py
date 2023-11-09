@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator, model_validator
-from bifrostx.__version__ import version as bifrostx_version
+from bifrostx import __version__ as bifrostx_version
 from distutils.version import LooseVersion
 import re
 from pathlib import Path
