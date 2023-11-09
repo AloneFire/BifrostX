@@ -1,14 +1,15 @@
-# bifrostxX
+![Python Version](https://img.shields.io/badge/python-%3E%3D3.9-green)
+# BifrostxX
 > 插件式快速服务框架
 
 ## 安装
 ```
-pip install bifrostxx
+pip install bifrostx
 ```
 
 ## 快速开始
 ```
-bifrostxx server
+bifrostx server
 ```
 
 ## 开发指南

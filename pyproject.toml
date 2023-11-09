@@ -1,6 +1,6 @@
 [project]
 name = "BifrostX"
-version = "0.1.1"
+version = "0.1.2"
 description = "BifrostX - Intelligent Assembling, Unlimited Possibilities!"
 authors = [{ name = "Bevis", email = "alonefire@foxmail.com" }]
 dependencies = [
@@ -14,6 +14,10 @@ dependencies = [
 requires-python = ">=3.9"
 readme = "README.md"
 license = { text = "MIT" }
+
+[project.urls]
+"Homepage" = "https://github.com/AloneFire/BifrostX"
+"Bug Tracker" = "https://github.com/AloneFire/BifrostX/issues"
 
 [build-system]
 requires = ["pdm-backend"]
