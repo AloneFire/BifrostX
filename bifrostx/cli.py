@@ -1,6 +1,6 @@
 import click
-from bifrost.server import start_server
-from bifrost.__version__ import metadata
+from bifrostx.server import start_server
+from bifrostx.__version__ import metadata
 
 
 @click.group

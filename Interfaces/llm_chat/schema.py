@@ -1,6 +1,6 @@
-from bifrost.interface.base import BaseInterface
+from bifrostx.interface.base import BaseInterface
 from abc import abstractmethod
-from bifrost.core.data_model import BaseModel, confloat, constr, field_validator
+from bifrostx.core.data_model import BaseModel, confloat, constr, field_validator
 from typing import Optional, List
 
 

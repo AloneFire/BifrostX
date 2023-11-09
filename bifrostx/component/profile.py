@@ -1,6 +1,6 @@
-from bifrost.core.profile import BaseProfile
+from bifrostx.core.profile import BaseProfile
 from typing import List
-from bifrost.adapter.profile import ImplementInterface, InterfaceProfile
+from bifrostx.adapter.profile import ImplementInterface, InterfaceProfile
 from pydantic import model_validator
 
 
@@ -16,7 +16,7 @@ class ComponentProfile(BaseProfile):
     def validate_interface(self):
         for reference in self.references:
             try:
-                interface_info = InterfaceProfile.load_by_model_name(
+                interface_info = InterfaceProfile.load_by_module_name(
                     reference.interface
                 )
             except ImportError:

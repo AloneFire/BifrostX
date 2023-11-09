@@ -7,10 +7,10 @@ from pathlib import Path
 from pydantic import BaseModel, validate_call
 from hypercorn.config import Config as HypercornConfig
 from hypercorn.asyncio import serve
-from bifrost.initialization import init_extension_dir
+from bifrostx.initialization import init_extension_dir
 from typing import Dict, Optional
-from bifrost.component.register import ComponentRegister
-from bifrost.config import Config
+from bifrostx.component.register import ComponentRegister
+from bifrostx.config import Config
 
 
 class RouterConfig(BaseModel):
@@ -21,7 +21,7 @@ class RouterConfig(BaseModel):
 
 
 class ServerConfig(BaseModel):
-    app_name: str = "BifrostServer"
+    app_name: str = "BifrostXServer"
     app_version: str = "0.1.0"
     app_description: str = ""
     server_bind: str = "127.0.0.1:8100"

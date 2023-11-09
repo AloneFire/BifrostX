@@ -1,10 +1,10 @@
 from pathlib import Path
 import sys
-from bifrost.interface.register import InterfaceRegister
-from bifrost.adapter.register import AdapterRegister
-from bifrost.component.register import ComponentRegister
-from bifrost.config import Config
-from bifrost.utils.logger import logger
+from bifrostx.interface.register import InterfaceRegister
+from bifrostx.adapter.register import AdapterRegister
+from bifrostx.component.register import ComponentRegister
+from bifrostx.config import Config
+from bifrostx.utils.logger import logger
 
 
 def init_extension_dir():

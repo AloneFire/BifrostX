@@ -1,5 +1,5 @@
 from loguru import logger
-from bifrost.config import Config
+from bifrostx.config import Config
 import sys
 
 logger.remove()

@@ -1,7 +1,7 @@
-from bifrost.interface.base import BaseInterface
+from bifrostx.interface.base import BaseInterface
 from abc import abstractmethod
 from .schema import *
-from bifrost.core.data_model import validate_call
+from bifrostx.core.data_model import validate_call
 
 
 class Interface(BaseInterface):

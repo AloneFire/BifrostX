@@ -1,6 +1,6 @@
-from bifrost.core.profile import BaseProfile
+from bifrostx.core.profile import BaseProfile
 from pydantic import model_validator, BaseModel
-from bifrost.interface.profile import InterfaceProfile
+from bifrostx.interface.profile import InterfaceProfile
 from typing import List
 
 
@@ -17,13 +17,19 @@ class AdapterProfile(BaseProfile):
     def load_by_module_name(cls, model_name):
         return super().load_by_module_name(f"Adapters.{model_name}")
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_interface(self):
         for implement in self.implements:
             try:
-                interface_info = InterfaceProfile.load_by_module_name(implement.interface)
+                interface_info = InterfaceProfile.load_by_module_name(
+                    implement.interface
+                )
             except ImportError:
-                raise ValueError(f"Adapter[{self.display_name}]所依赖的Interface[{implement.interface}]不存在")
+                raise ValueError(
+                    f"Adapter[{self.display_name}]所依赖的Interface[{implement.interface}]不存在"
+                )
             if interface_info.version == implement.interface_version:
                 return self
-            raise ValueError(f"Adapter[{self.display_name}]所依赖的Interface[{implement.interface}]版本不一致")
+            raise ValueError(
+                f"Adapter[{self.display_name}]所依赖的Interface[{implement.interface}]版本不一致"
+            )

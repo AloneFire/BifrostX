@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator, model_validator
-from bifrost.__version__ import version as bifrost_version
+from bifrostx.__version__ import version as bifrostx_version
 from distutils.version import LooseVersion
 import re
 from pathlib import Path
@@ -7,17 +7,17 @@ import tomli
 from importlib import import_module
 from typing import List
 import pkg_resources
-from bifrost.utils.logger import logger
+from bifrostx.utils.logger import logger
 import sys
 import subprocess
-from bifrost.config import Config
+from bifrostx.config import Config
 
 
 class BaseProfile(BaseModel):
     module_name: str = ""
     version: str
     display_name: str
-    bifrost_version: str = ""
+    bifrostx_version: str = ""
     dependencies: List[str] = []
     enter_class: str
 
@@ -28,11 +28,11 @@ class BaseProfile(BaseModel):
             return value
         raise ValueError(f"版本号格式错误")
 
-    @field_validator("bifrost_version")
+    @field_validator("bifrostx_version")
     @classmethod
-    def validate_bifrost_version(cls, value: str):
+    def validate_bifrostx_version(cls, value: str):
         if value:
-            current_version = LooseVersion(bifrost_version)
+            current_version = LooseVersion(bifrostx_version)
             if current_version >= LooseVersion(value):
                 return value
             raise ValueError(f"拓展需求版本与当前不匹配")
@@ -40,9 +40,9 @@ class BaseProfile(BaseModel):
 
     @classmethod
     def load_by_module(cls, module):
-        file = Path(module.__file__).parent.joinpath("bifrost.toml")
+        file = Path(module.__file__).parent.joinpath("bifrostx.toml")
         if not file.exists():
-            raise ValueError("未找到bifrost.toml")
+            raise ValueError("未找到bifrostx.toml")
         info = tomli.loads(file.read_text(encoding="utf-8"))
         rel = cls(**info)
         rel.module_name = module.__name__
@@ -53,10 +53,10 @@ class BaseProfile(BaseModel):
         file = (
             Path(Config.EXTENSION_DIR)
             .joinpath(*module_name.split("."))
-            .joinpath("bifrost.toml")
+            .joinpath("bifrostx.toml")
         )
         if not file.exists():
-            raise ValueError("未找到bifrost.toml")
+            raise ValueError("未找到bifrostx.toml")
         info = tomli.loads(file.read_text(encoding="utf-8"))
         rel = cls(**info)
         rel.module_name = module_name

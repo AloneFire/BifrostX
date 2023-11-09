@@ -1,7 +1,7 @@
 from abc import ABC
-from bifrost.config import Config
+from bifrostx.config import Config
 from pydantic import BaseModel
-from bifrost.utils.logger import logger
+from bifrostx.utils.logger import logger
 
 
 class BaseInterface(ABC):

@@ -1,3 +1,3 @@
-from bifrost.server import start_server
+from bifrostx.server import start_server
 
 start_server()

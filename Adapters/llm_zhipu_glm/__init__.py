@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from bifrost.core.data_model import BaseModel, confloat, validate_call
+from bifrostx.core.data_model import BaseModel, confloat, validate_call
 from enum import Enum
 from Interfaces.llm_chat.interface import Interface
 from Interfaces.llm_chat.schema import ChatInputs, ChatHistory

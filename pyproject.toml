@@ -1,7 +1,7 @@
 [project]
-name = "Bifrost"
+name = "BifrostX"
 version = "0.1.0"
-description = "Connect and change the world, Bifrost makes creation simple."
+description = "BifrostX - Intelligent Assembling, Unlimited Possibilities!"
 authors = [{ name = "Bevis", email = "alonefire@foxmail.com" }]
 dependencies = [
     "pydantic>=2.4.2",
@@ -20,7 +20,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [project.entry-points.console_scripts]
-bifrost = "bifrost.cli:cli"
+bifrostx = "bifrostx.cli:cli"
 
 [tool.pdm.dev-dependencies]
 dev = ["black>=23.10.1"]

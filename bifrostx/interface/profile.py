@@ -1,4 +1,4 @@
-from bifrost.core.profile import BaseProfile
+from bifrostx.core.profile import BaseProfile
 
 
 class InterfaceProfile(BaseProfile):

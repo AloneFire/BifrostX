@@ -1,8 +1,8 @@
 from typing import List, Optional
-from bifrost.config import Config
-from bifrost.utils.logger import logger
+from bifrostx.config import Config
+from bifrostx.utils.logger import logger
 from Interfaces.llm_chat.interface import Interface
-from bifrost.core.data_model import BaseModel, validate_call, confloat
+from bifrostx.core.data_model import BaseModel, validate_call, confloat
 from enum import Enum
 import openai
 import tiktoken

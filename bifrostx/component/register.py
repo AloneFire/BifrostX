@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from .base import BaseComponent
-from bifrost.interface.register import InterfaceRegister, InterfaceInfo
+from bifrostx.interface.register import InterfaceRegister, InterfaceInfo
 from .profile import ComponentProfile
 from typing import Dict, List, Type
-from bifrost.utils.logger import logger
+from bifrostx.utils.logger import logger
 
 
 class ComponentInfo(BaseModel):

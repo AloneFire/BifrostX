@@ -1,9 +1,9 @@
-from bifrost.component.base import BaseComponent
+from bifrostx.component.base import BaseComponent
 from Interfaces.llm_chat.schema import ChatHistory, ChatInputs
 from Interfaces.llm_chat.interface import Interface as LLL_Chat_Interface
-from bifrost.core.data_model import BaseModel, InstanceOf
+from bifrostx.core.data_model import BaseModel, InstanceOf
 from typing import List
-from bifrost.config import Config
+from bifrostx.config import Config
 
 
 class ComponentConfig(BaseModel):
