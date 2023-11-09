@@ -1,6 +1,6 @@
 [project]
 name = "BifrostX"
-version = "0.1.2"
+version = "0.1.3"
 description = "BifrostX - Intelligent Assembling, Unlimited Possibilities!"
 authors = [{ name = "Bevis", email = "alonefire@foxmail.com" }]
 dependencies = [

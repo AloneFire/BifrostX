@@ -1,5 +1,5 @@
 ![Python Version](https://img.shields.io/badge/python-%3E%3D3.9-green)
-# BifrostxX
+# BifrostX
 > 插件式快速服务框架
 
 ## 安装
