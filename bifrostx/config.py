@@ -69,7 +69,7 @@ class ConfigObject(BaseSettings):
 
     LOG_LEVEL: str = "DEBUG"
     EXTENSION_DIR: str = "."
-    FONTEND_DIR: str = "frontend"
+    FONTEND_DIR: str = "fontend"
     Adapters: Dict = {}
     Interfaces: Dict = {}
     Components: Dict = {}
