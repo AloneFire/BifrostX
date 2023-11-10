@@ -68,8 +68,6 @@ def create_app(server_config: ServerConfig):
         version=server_config.app_version,
         description=server_config.app_description,
     )
-    # # 注册首页
-    # app.add_api_route("/", index_view(server_config), methods=["GET"], summary="首页")
     # 注册routers
     register_routers(app, server_config)
     if Path(Config.FONTEND_DIR).exists():
