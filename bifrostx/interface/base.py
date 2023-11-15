@@ -28,7 +28,7 @@ class BaseInterface(ABC):
                 info = InterfaceRegister.get_interface(cls.__module__)
                 if info:
                     return info.get_adapter_instance(
-                        adapter_name=f"Adapters.{adapter_name}", instance_id=instance_id
+                        adapter_name=adapter_name, instance_id=instance_id
                     )
                 raise ValueError(f"未找到{cls.__module__}实例")
             else:
