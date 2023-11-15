@@ -2,7 +2,7 @@ from abc import ABC
 from bifrostx.config import Config
 from pydantic import BaseModel
 from bifrostx.utils.logger import logger
-from typing import Type
+from typing import Type, Optional
 
 
 class BaseInterface(ABC):
@@ -16,7 +16,11 @@ class BaseInterface(ABC):
         )
 
     @classmethod
-    def get_instance(cls, instance_id=None, adapter_name=None):
+    def get_instance(
+        cls, instance_id: Optional[str] = None, adapter_name: Optional[str] = None
+    ):
+        if ":" in instance_id and adapter_name is None:
+            adapter_name, instance_id = instance_id.split(":", 1)
         try:
             if cls.__module__.startswith("Interfaces"):
                 from .register import InterfaceRegister
@@ -29,7 +33,8 @@ class BaseInterface(ABC):
                 raise ValueError(f"未找到{cls.__module__}实例")
             else:
                 configs = Config.get_extension_config(
-                    module=cls.__module__, instances=True
+                    module=adapter_name if adapter_name else cls.__module__,
+                    instances=True,
                 )
                 if configs:
                     if not instance_id:
