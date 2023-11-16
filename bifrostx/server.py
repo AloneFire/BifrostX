@@ -32,16 +32,6 @@ class ServerConfig(BaseModel):
     routers: Dict[str, RouterConfig] = {}
 
 
-def index_view(server_config: ServerConfig):
-    def index():
-        fontend_index = Path(Config.FONTEND_DIR).joinpath("index.html")
-        if fontend_index.exists():
-            return HTMLResponse(fontend_index.read_text())
-        return HTMLResponse(f"<h1>Hello {server_config.app_name}</h1>")
-
-    return index
-
-
 def register_routers(app: FastAPI, server_config: ServerConfig):
     api_router = APIRouter(prefix="/api")
     for router_name, router_config in server_config.routers.items():
@@ -85,7 +75,7 @@ def start_server(server_config: ServerConfig = None):
     if server_config is None:
         config_file = Path("server.toml")
         if config_file.exists():
-            server_config = tomli.loads(config_file.read_text())
+            server_config = tomli.loads(config_file.read_text("utf-8"))
             server_config = ServerConfig(**server_config)
         else:
             server_config = ServerConfig()

@@ -18,7 +18,7 @@ class TomlConfigSettingSource(PydanticBaseSettingsSource):
         config_file = self.config.get("bifrostx_config", "config.toml")
         file_path = Path(config_file)
         if file_path.exists():
-            data = tomli.loads(file_path.read_text("utf8"))
+            data = tomli.loads(file_path.read_text("utf-8"))
             field_value = data.get(field_name)
             return field_value, field_name, False
         else:
