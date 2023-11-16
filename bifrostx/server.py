@@ -15,8 +15,7 @@ from bifrostx.config import Config
 
 class RouterConfig(BaseModel):
     component: str
-    summary: Optional[str] = None
-    description: Optional[str] = None
+    tags: list = []
     config: dict = {}
 
 
@@ -46,8 +45,7 @@ def register_routers(app: FastAPI, server_config: ServerConfig):
                 path=f"/{router_name}/{endpoint[4:]}",
                 endpoint=getattr(component, endpoint),
                 methods=["POST"],
-                summary=router_config.summary,
-                description=router_config.description,
+                tags=router_config.tags,
             )
     app.include_router(api_router)
 
