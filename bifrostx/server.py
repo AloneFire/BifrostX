@@ -14,6 +14,7 @@ from bifrostx.config import Config
 
 
 class RouterConfig(BaseModel):
+    path: str = ""
     component: str
     tags: list = []
     config: dict = {}
@@ -41,8 +42,13 @@ def register_routers(app: FastAPI, server_config: ServerConfig):
         component = component_info.component(component_instance_config)
         endpoints = [func for func in dir(component) if func.startswith("api_")]
         for endpoint in endpoints:
+            path = (
+                router_config.path
+                if router_config.path
+                else f"/{router_name}/{endpoint[4:]}"
+            )
             api_router.add_api_route(
-                path=f"/{router_name}/{endpoint[4:]}",
+                path=path,
                 endpoint=getattr(component, endpoint),
                 methods=["POST"],
                 tags=router_config.tags,
