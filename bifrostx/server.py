@@ -11,6 +11,7 @@ from bifrostx.initialization import init_extension_dir
 from typing import Dict, Optional
 from bifrostx.component.register import ComponentRegister
 from bifrostx.config import Config
+from fastapi.middleware.cors import CORSMiddleware
 
 
 class RouterConfig(BaseModel):
@@ -35,6 +36,7 @@ class ServerConfig(BaseModel):
     server_access_log: str = "-"
     server_error_log: str = "-"
     server_use_reloader: bool = True
+    server_cors_allow_origins: list = []
     routers: Dict[str, RouterConfig] = {}
 
 
@@ -59,6 +61,14 @@ def register_routers(app: FastAPI, server_config: ServerConfig):
                 tags=router_config.tags,
             )
     app.include_router(api_router)
+    if server_config.server_cors_allow_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=server_config.server_cors_allow_origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
 
 def create_app(server_config: ServerConfig):
