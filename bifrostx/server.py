@@ -4,7 +4,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-from pydantic import BaseModel, validate_call
+from pydantic import BaseModel, validate_call, field_validator
 from hypercorn.config import Config as HypercornConfig
 from hypercorn.asyncio import serve
 from bifrostx.initialization import init_extension_dir
@@ -18,6 +18,12 @@ class RouterConfig(BaseModel):
     component: str
     tags: list = []
     config: dict = {}
+
+    @field_validator("path")
+    def valiudate_path(cls, v):
+        if not v.startswith("/"):
+            raise ValueError("path必须以/开头")
+        return v
 
 
 class ServerConfig(BaseModel):
@@ -42,11 +48,10 @@ def register_routers(app: FastAPI, server_config: ServerConfig):
         component = component_info.component(component_instance_config)
         endpoints = [func for func in dir(component) if func.startswith("api_")]
         for endpoint in endpoints:
-            path = (
-                router_config.path
-                if router_config.path
-                else f"/{router_name}/{endpoint[4:]}"
-            )
+            path = router_config.path if router_config.path else f"/{router_name}"
+            if not path.endswith("/"):
+                path += "/"
+            path += endpoint[4:]
             api_router.add_api_route(
                 path=path,
                 endpoint=getattr(component, endpoint),
