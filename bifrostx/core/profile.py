@@ -13,13 +13,20 @@ import subprocess
 from bifrostx.config import Config
 
 
+class InterfaceInfo(BaseModel):
+    interface: str
+    interface_version: str
+
+
 class BaseProfile(BaseModel):
+    _module_prefix: str = ""
     module_name: str = ""
     version: str
     display_name: str
     bifrostx_version: str = ""
     dependencies: List[str] = []
     enter_class: str
+    references: List[InterfaceInfo] = []
 
     @field_validator("version")
     @classmethod
@@ -50,6 +57,12 @@ class BaseProfile(BaseModel):
 
     @classmethod
     def load_by_module_name(cls, module_name):
+        return cls._load_by_module_name(module_name, prefix=cls._module_prefix.default)
+
+    @classmethod
+    def _load_by_module_name(cls, module_name, prefix=None):
+        if prefix:
+            module_name = f"{prefix}.{module_name}"
         file = (
             Path(Config.EXTENSION_DIR)
             .joinpath(*module_name.split("."))
@@ -74,20 +87,34 @@ class BaseProfile(BaseModel):
             raise ValueError(f"Enter Class: {self.module_name}.{self.enter_class}不存在")
 
     @model_validator(mode="after")
-    def validate_dependencies(self):
-        if not self.dependencies:
-            return self
-        for dependency in self.dependencies:
-            rel = re.search(
-                r"^([^>=<]*)([>=<]*)([^>=<]*)$", dependency.replace(" ", "")
-            )
-            if rel:
-                key, _, ver = rel.groups()
-                # TODO: 检查依赖版本冲突
-                if key not in [pkg.key for pkg in pkg_resources.working_set]:
-                    subprocess.check_call(
-                        [sys.executable, "-m", "pip", "install", dependency]
+    def validate_dependencies_and_interface(self):
+        if self.dependencies:
+            for dependency in self.dependencies:
+                rel = re.search(
+                    r"^([^>=<]*)([>=<]*)([^>=<]*)$", dependency.replace(" ", "")
+                )
+                if rel:
+                    key, _, ver = rel.groups()
+                    # TODO: 检查依赖版本冲突
+                    if key not in [pkg.key for pkg in pkg_resources.working_set]:
+                        subprocess.check_call(
+                            [sys.executable, "-m", "pip", "install", dependency]
+                        )
+                else:
+                    logger.warning(f"{self.display_name} 依赖包 {dependency} 格式不正确")
+
+        if self.references:
+            for reference in self.references:
+                try:
+                    reference_interface = self._load_by_module_name(
+                        reference.interface, "Interfaces"
                     )
-            else:
-                logger.warning(f"{self.display_name} 依赖包 {dependency} 格式不正确")
+                except Exception:
+                    raise ValueError(
+                        f"{self._module_prefix}[{self.display_name}]所依赖的Interface[{reference.interface}]不存在"
+                    )
+                if reference_interface.version != reference.interface_version:
+                    raise ValueError(
+                        f"{self._module_prefix}[{self.display_name}]所依赖的Interface[{reference.interface}]版本不一致"
+                    )
         return self

@@ -1,0 +1,6 @@
+version = "0.1.0"
+bifrostx_version = "0.1.0"
+display_name = "大语言模型对话能力接口"
+[[references]]
+interface = "llm_chat"
+interface_version = "0.2.0"

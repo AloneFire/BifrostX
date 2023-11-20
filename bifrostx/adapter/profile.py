@@ -1,21 +1,13 @@
-from bifrostx.core.profile import BaseProfile
-from pydantic import model_validator, BaseModel
+from bifrostx.core.profile import BaseProfile, InterfaceInfo
+from pydantic import model_validator
 from bifrostx.interface.profile import InterfaceProfile
 from typing import List
 
 
-class ImplementInterface(BaseModel):
-    interface: str
-    interface_version: str
-
-
 class AdapterProfile(BaseProfile):
-    implements: List[ImplementInterface]
+    implements: List[InterfaceInfo]
     enter_class: str = "Adapter"
-
-    @classmethod
-    def load_by_module_name(cls, model_name):
-        return super().load_by_module_name(f"Adapters.{model_name}")
+    _module_prefix: str = "Adapters"
 
     @model_validator(mode="after")
     def validate_interface(self):

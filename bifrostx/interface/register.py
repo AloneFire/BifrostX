@@ -4,6 +4,7 @@ from .profile import InterfaceProfile
 from typing import Dict, List, Type, Union
 from bifrostx.utils.logger import logger
 from bifrostx.adapter.register import AdapterInfo
+from bifrostx.core.data_model import ValidationError
 
 
 class InterfaceInfo(BaseModel):
@@ -58,6 +59,10 @@ class InterfaceRegister:
                 module_name=module_name, interface=interface, profile=profile
             )
             logger.info(f"Load Interface [{module_name}] Success")
+        except ValidationError as ex:
+            logger.warning(
+                f"Load Interface [{module_name}] Error: {ex.errors()[0]['ctx']['error']}"
+            )
         except Exception as ex:
             logger.warning(f"Load Interface [{module_name}] Error: {ex}")
 
