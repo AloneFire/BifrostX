@@ -8,7 +8,8 @@ from typing import Type, Optional
 class BaseInterface(ABC):
     instance_config_schema: Type[BaseModel] = None
 
-    def __init__(self, instance_config):
+    def __init__(self, instance_config={}, instance_id=None):
+        self.instance_id = instance_id
         self.instance_config = (
             self.instance_config_schema(**instance_config)
             if self.instance_config_schema

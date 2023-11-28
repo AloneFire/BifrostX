@@ -20,11 +20,16 @@ class InterfaceInfo(BaseModel):
             for adapter in self.adapters.values():
                 if adapter.instance_configs:
                     if not instance_id:
+                        instance_id = list(adapter.instance_configs.keys())[0]
                         return adapter.adapter(
-                            list(adapter.instance_configs.values())[0]
+                            adapter.instance_configs[instance_id],
+                            instance_id=instance_id,
                         )
                     elif instance_id in adapter.instance_configs:
-                        return adapter.adapter(adapter.instance_configs[instance_id])
+                        return adapter.adapter(
+                            adapter.instance_configs[instance_id],
+                            instance_id=instance_id,
+                        )
             raise ValueError(f"未找到 Interface[{self.module_name}] 的实例")
         adapter_info = self.adapters.get(adapter_name)
         if not adapter_info:
@@ -37,14 +42,14 @@ class InterfaceInfo(BaseModel):
                 raise ValueError(
                     f"未找到 Interface[{self.module_name}] 的 Adapter[{adapter_name}] 的实例[{instance_id}]"
                 )
-            return adapter_info.adapter(instance_config)
+            return adapter_info.adapter(instance_config, instance_id)
         else:
             instance_configs = list(adapter_info.instance_configs.values())
             if not instance_configs:
                 raise ValueError(
                     f"未找到 Interface[{self.module_name}] 的 Adapter[{adapter_name}] 的实例"
                 )
-            return adapter_info.adapter(instance_configs[0])
+            return adapter_info.adapter(instance_configs[0], instance_id)
 
 
 class InterfaceRegister:
